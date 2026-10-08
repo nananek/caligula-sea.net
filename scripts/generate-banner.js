@@ -216,7 +216,11 @@ async function generateBanner() {
   console.log(`✅ OGP image generated: ${ogpOutputPath} (${ogpWidth}x${ogpHeight})`);
 }
 
-generateBanner().catch((err) => {
+generateBanner().then(() => {
+  // NOTE: explicitly exit — keep-alive sockets from image download
+  // can hold the event loop open forever
+  process.exit(0);
+}).catch((err) => {
   console.error('❌ Failed to generate banner:', err);
   process.exit(1);
 });
