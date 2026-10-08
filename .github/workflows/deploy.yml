@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  assets:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +24,30 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - run: npm run copy-assets
+      - run: tar -czf assets.tgz -C public banners banya-.webp ogp.webp favicon.png apple-touch-icon.png discord-logo.png matrix-logo.png misskey-logo.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generated-assets
+          path: assets.tgz
+          retention-days: 1
+  build:
+    needs: assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-assets
+      - run: tar -xzf assets.tgz -C public/ && rm assets.tgz
+      # NOTE: npx astro directly to skip prebuild (copy-assets),
+      # assets come from the macOS job above
+      - run: npx astro check && npx astro build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
