@@ -1,0 +1,203 @@
+---
+interface Props {
+	title: string;
+	description: string;
+	siteUrl: string;
+	ogType?: string;
+}
+
+const { title, description, siteUrl, ogType = 'website' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<title>{title}</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content={description}>
+		<meta name="generator" content={Astro.generator}>
+		<link rel="preconnect" href="https://misskey.caligula-sea.net">
+
+		<!-- OGP -->
+		<meta property="og:title" content={title}>
+		<meta property="og:description" content={description}>
+		<meta property="og:type" content={ogType}>
+		<meta property="og:url" content={siteUrl}>
+		<meta property="og:image" content={`${siteUrl}/ogp.webp`}>
+		<meta property="og:site_name" content={title}>
+		<meta property="og:locale" content="ja_JP">
+
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:title" content={title}>
+		<meta name="twitter:description" content={description}>
+		<meta name="twitter:image" content={`${siteUrl}/ogp.webp`}>
+
+		<!-- Favicon -->
+		<link rel="icon" type="image/png" href="/favicon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+		<!-- Theme: FOUC防止のため head 内で早期適用 -->
+		<script is:inline>
+			(function() {
+				const saved = localStorage.getItem('theme');
+				if (saved === 'dark' || saved === 'light') {
+					document.documentElement.setAttribute('data-theme', saved);
+				} else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+					document.documentElement.setAttribute('data-theme', 'dark');
+				} else {
+					document.documentElement.setAttribute('data-theme', 'light');
+				}
+			})();
+		</script>
+	</head>
+	<body>
+		<main>
+			<slot />
+		</main>
+
+		<button id="theme-toggle" class="theme-toggle" aria-label="テーマ切替">
+			<span class="theme-icon-light">&#9790;</span>
+			<span class="theme-icon-dark">&#9728;</span>
+		</button>
+
+		<script is:inline>
+			function copyID(idElementId, feedbackId) {
+				const idElement = document.getElementById(idElementId);
+				if (!idElement || !idElement.textContent) return;
+
+				const id = idElement.textContent;
+				navigator.clipboard.writeText(id).then(() => {
+					const feedback = document.getElementById(feedbackId);
+					if (!feedback) return;
+					feedback.classList.remove('hidden');
+					setTimeout(() => feedback.classList.add('hidden'), 2000);
+				});
+			}
+
+			document.getElementById('theme-toggle').addEventListener('click', function() {
+				const current = document.documentElement.getAttribute('data-theme');
+				const next = current === 'dark' ? 'light' : 'dark';
+				document.documentElement.setAttribute('data-theme', next);
+				localStorage.setItem('theme', next);
+			});
+		</script>
+	</body>
+</html>
+
+<style is:global>
+	/* Reset */
+	*, *::before, *::after {
+		box-sizing: border-box;
+	}
+	body, h1, h2, h3, p, ul {
+		margin: 0;
+	}
+
+	/* Design Tokens — Light (default) */
+	:root {
+		--color-bg: #f8f9fa;
+		--color-text: #212529;
+		--color-text-muted: #6c757d;
+		--color-card-bg: #ffffff;
+		--color-card-border: #dee2e6;
+		--color-accent: #0d6efd;
+		--color-success: #198754;
+		--shadow-card: 0 .125rem .25rem rgba(0, 0, 0, .075);
+		--radius: 0.375rem;
+		--max-width: 540px;
+		--font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+	}
+
+	/* Design Tokens — Dark */
+	html[data-theme="dark"] {
+		--color-bg: #181a1b;
+		--color-text: #f3f3f3;
+		--color-text-muted: #aaa;
+		--color-card-bg: #23272a;
+		--color-card-border: #444;
+		--shadow-card: 0 .125rem .25rem rgba(0, 0, 0, .3);
+	}
+
+	/* Global */
+	html {
+		scroll-behavior: smooth;
+	}
+	body {
+		font-family: var(--font-family);
+		background-color: var(--color-bg);
+		color: var(--color-text);
+		line-height: 1.5;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	/* Card (shared) */
+	.card {
+		background-color: var(--color-card-bg);
+		border: 1px solid var(--color-card-border);
+		border-radius: var(--radius);
+		box-shadow: var(--shadow-card);
+		max-width: var(--max-width);
+		margin-left: auto;
+		margin-right: auto;
+	}
+	.card-body {
+		padding: 1rem;
+	}
+	.card-title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		margin-bottom: 0.75rem;
+	}
+
+	/* Section container */
+	.section {
+		max-width: calc(var(--max-width) + 2rem);
+		margin-left: auto;
+		margin-right: auto;
+		padding: 1rem;
+	}
+
+	/* Banner image (shared between FriendsList & SiteBanner) */
+	.banner-img {
+		height: 60px;
+		margin: 8px auto;
+		display: block;
+	}
+
+	/* Utility */
+	.hidden {
+		display: none;
+	}
+
+	/* Theme toggle button */
+	.theme-toggle {
+		position: fixed;
+		bottom: 1rem;
+		right: 1rem;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 50%;
+		border: 1px solid var(--color-card-border);
+		background: var(--color-card-bg);
+		color: var(--color-text);
+		cursor: pointer;
+		font-size: 1.2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: var(--shadow-card);
+		transition: transform 0.2s;
+		z-index: 100;
+	}
+	.theme-toggle:hover {
+		transform: scale(1.1);
+	}
+	/* Light mode: show moon, hide sun */
+	html[data-theme="light"] .theme-icon-light { display: inline; }
+	html[data-theme="light"] .theme-icon-dark { display: none; }
+	/* Dark mode: show sun, hide moon */
+	html[data-theme="dark"] .theme-icon-light { display: none; }
+	html[data-theme="dark"] .theme-icon-dark { display: inline; }
+</style>

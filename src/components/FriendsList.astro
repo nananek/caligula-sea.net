@@ -1,0 +1,53 @@
+---
+interface Friend {
+	name: string;
+	url: string;
+	banner: string;
+}
+
+interface Props {
+	friends: Friend[];
+}
+
+const { friends } = Astro.props;
+---
+
+<div class="section">
+	<div class="card">
+		<div class="card-body">
+			<h2 class="card-title">お友だちのみなさま</h2>
+			<nav aria-label="お友だちのサイト">
+				<ul class="banner-list">
+					{friends.map((friend) => (
+						<li>
+							<a href={friend.url}
+							   target="_blank"
+							   rel="noopener noreferrer"
+							   aria-label={`${friend.name}のサイトを開く`}>
+								<img src={friend.banner}
+								     alt={`${friend.name}のバナー`}
+								     class="banner-img"
+								     loading="lazy">
+							</a>
+						</li>
+					))}
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+
+<style>
+	.banner-list {
+		text-align: center;
+		padding-left: 0;
+		margin-bottom: 0;
+	}
+	.banner-list li {
+		margin-bottom: 24px;
+		list-style: none;
+	}
+	.banner-list li:last-child {
+		margin-bottom: 0;
+	}
+</style>

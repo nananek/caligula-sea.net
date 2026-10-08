@@ -1,0 +1,62 @@
+---
+interface AboutItem {
+	label: string;
+	value: string;
+}
+
+interface Props {
+	about: {
+		heading: string;
+		text: string;
+		items: AboutItem[];
+	};
+}
+
+const { about } = Astro.props;
+---
+
+<div class="section">
+	<div class="card">
+		<div class="card-body">
+			<h2 class="card-title">{about.heading}</h2>
+			<p class="about-text">{about.text}</p>
+			{about.items.length > 0 && (
+				<dl class="about-list">
+					{about.items.map((item) => (
+						<div class="about-item">
+							<dt>{item.label}</dt>
+							<dd>{item.value}</dd>
+						</div>
+					))}
+				</dl>
+			)}
+		</div>
+	</div>
+</div>
+
+<style>
+	.about-text {
+		margin-bottom: 1rem;
+		line-height: 1.7;
+	}
+	.about-list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.about-item {
+		display: flex;
+		gap: 1rem;
+		align-items: baseline;
+	}
+	.about-item dt {
+		font-weight: 600;
+		white-space: nowrap;
+		min-width: 5em;
+		color: var(--color-text-muted);
+		font-size: 0.9rem;
+	}
+	.about-item dd {
+		margin: 0;
+	}
+</style>

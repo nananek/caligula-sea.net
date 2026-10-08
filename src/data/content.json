@@ -1,0 +1,105 @@
+{
+  "site": {
+    "url": "https://caligula-sea.net",
+    "description": "猫乃名無 (仮) の個人サイト「7743号室のかりぐらし」"
+  },
+  "profile": {
+    "name": "猫乃名無 (仮)",
+    "nameRomaji": "Nekono Nana KAKKO KARI",
+    "image": "https://misskey.caligula-sea.net/proxy/avatar.webp?url=https%3A%2F%2Fmisskey.caligula-sea.net%2Ffiles%2Fa21a05bd-688a-4bcb-9fb6-0937283788ac&avatar=1",
+    "socialLinks": [
+      {
+        "name": "Misskey",
+        "url": "https://misskey.io/@nananek",
+        "icon": "/misskey-logo.png",
+        "type": "link"
+      },
+      {
+        "name": "GitHub",
+        "url": "https://github.com/nananek",
+        "icon": "https://github.githubassets.com/favicons/favicon.svg",
+        "type": "link"
+      },
+      {
+        "name": "Discord",
+        "icon": "/discord-logo.png",
+        "type": "modal",
+        "modalId": "discord"
+      },
+      {
+        "name": "X",
+        "url": "https://x.com/nana_nekono",
+        "icon": "https://abs.twimg.com/favicons/twitter.3.ico",
+        "type": "link"
+      }
+    ]
+  },
+  "about": {
+    "heading": "自己紹介",
+    "text": "ねこのみすきー鯖缶です。",
+    "items": [
+      { "label": "好きなゲーム", "value": "Genshin Impact" },
+      { "label": "好きな原神キャラクター", "value": "神里綾華" },
+      { "label": "好きな声優さん", "value": "早見沙織さん" },
+      { "label": "開発環境", "value": "Proxmox VE, Debian, Arch Linuxなど" }
+    ]
+  },
+  "friends": [
+    {
+      "name": "syobon.net",
+      "url": "https://syobon.net/",
+      "banner": "/banners/syobon.net.webp"
+    },
+    {
+      "name": "natumi.tkngh.jp",
+      "url": "https://natumi.tkngh.jp/",
+      "banner": "/banners/natumi.tkngh.jp.png"
+    },
+    {
+      "name": "kur0den.net",
+      "url": "https://www.kur0den.net/",
+      "banner": "/banners/kur0den.net.webp"
+    },
+    {
+      "name": "tomadoi.com",
+      "url": "https://tomadoi.com/",
+      "banner": "/banners/tomadoi.com.png"
+    },
+    {
+      "name": "sunset0916.net",
+      "url": "https://sunset0916.net/",
+      "banner": "/banners/sunset0916.net.png"
+    }
+  ],
+  "banner": {
+    "src": "/banya-.webp",
+    "alt": "バナー",
+    "height": "60px",
+    "generate": {
+      "enabled": true,
+      "width": 702,
+      "height": 180,
+      "mainText": "7743号室のかりぐらし",
+      "subText": "by Nekono Nana KAKKO KARI",
+      "characterImage": "https://misskey.caligula-sea.net/proxy/avatar.webp?url=https%3A%2F%2Fmisskey.caligula-sea.net%2Ffiles%2Fa21a05bd-688a-4bcb-9fb6-0937283788ac&avatar=1",
+      "backgroundColor": "#ffffff",
+      "textColor": "#000000",
+      "subTextColor": "#555555",
+      "mainFontSize": 39,
+      "subFontSize": 24,
+      "fontFamily": "sans-serif",
+      "fontWeight": "700"
+    }
+  },
+  "modals": [
+    {
+      "id": "discord",
+      "title": "Discord ID",
+      "contentLabel": "discordID",
+      "contentValue": "@nana_nekono",
+      "copyButtonText": "コピー",
+      "copyFeedbackText": "コピーしました！",
+      "closeButtonLabel": "閉じる"
+    }
+  ]
+}

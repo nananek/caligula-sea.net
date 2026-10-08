@@ -1,0 +1,30 @@
+{
+  "name": "caligula-sea-net",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "generate-banner": "node scripts/generate-banner.js",
+    "copy-assets": "mkdir -p public/banners && npm run generate-banner && cp banners/* public/banners/ && cp discord-logo.png matrix-logo.png misskey-logo.png public/",
+    "predev": "npm run copy-assets",
+    "prebuild": "npm run copy-assets",
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^4.16.18"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "sharp": "^0.34.5",
+    "typescript": "^5.6.3"
+  },
+  "allowScripts": {
+    "sharp@0.33.5": true,
+    "sharp@0.34.5": true,
+    "esbuild@0.21.5": true
+  }
+}

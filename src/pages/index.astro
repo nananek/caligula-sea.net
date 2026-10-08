@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProfileCard from '../components/ProfileCard.astro';
+import About from '../components/About.astro';
+import FriendsList from '../components/FriendsList.astro';
+import SiteBanner from '../components/SiteBanner.astro';
+import contentData from '../data/content.json';
+
+const pageTitle = "7743号室のかりぐらし";
+const { site, profile, about, friends, banner, modals } = contentData;
+---
+
+<Layout title={pageTitle} description={site.description} siteUrl={site.url}>
+	<ProfileCard profile={profile} modals={modals} />
+	<About about={about} />
+	<FriendsList friends={friends} />
+	<SiteBanner banner={banner} />
+</Layout>

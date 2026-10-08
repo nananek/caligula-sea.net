@@ -1,0 +1,101 @@
+---
+interface Props {
+	id: string;
+	title: string;
+	contentLabel: string;
+	contentValue: string;
+	copyButtonText: string;
+	copyFeedbackText: string;
+	closeButtonLabel: string;
+}
+
+const { id, title, contentLabel, contentValue, copyButtonText, copyFeedbackText, closeButtonLabel } = Astro.props;
+const dialogId = `${id}Dialog`;
+---
+
+<dialog id={dialogId} class="modal-dialog">
+	<div class="modal-header">
+		<h5 class="modal-title">{title}</h5>
+		<button type="button" class="modal-close" aria-label={closeButtonLabel}>&times;</button>
+	</div>
+	<div class="modal-body">
+		<p><code id={contentLabel}>{contentValue}</code></p>
+		<button class="btn-copy" onclick={`copyID('${contentLabel}', '${id}Feedback')`}>{copyButtonText}</button>
+		<div id={`${id}Feedback`} class="feedback hidden">{copyFeedbackText}</div>
+	</div>
+</dialog>
+
+<style>
+	.modal-dialog {
+		border: 1px solid var(--color-card-border);
+		border-radius: var(--radius);
+		background: var(--color-card-bg);
+		color: var(--color-text);
+		padding: 0;
+		max-width: 400px;
+		width: calc(100% - 2rem);
+	}
+	.modal-dialog::backdrop {
+		background: rgba(0, 0, 0, 0.5);
+	}
+	.modal-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1rem;
+		border-bottom: 1px solid var(--color-card-border);
+	}
+	.modal-title {
+		font-size: 1.25rem;
+		font-weight: 600;
+		margin: 0;
+	}
+	.modal-close {
+		background: none;
+		border: none;
+		font-size: 1.5rem;
+		line-height: 1;
+		cursor: pointer;
+		color: var(--color-text-muted);
+		padding: 0.25rem 0.5rem;
+	}
+	.modal-close:hover {
+		color: var(--color-text);
+	}
+	.modal-body {
+		padding: 1.5rem;
+		text-align: center;
+	}
+	.modal-body code {
+		font-size: 1.1rem;
+	}
+	.btn-copy {
+		background: none;
+		border: 1px solid var(--color-accent);
+		color: var(--color-accent);
+		padding: 0.375rem 0.75rem;
+		border-radius: var(--radius);
+		cursor: pointer;
+		font-size: 1rem;
+		transition: background 0.15s, color 0.15s;
+	}
+	.btn-copy:hover {
+		background: var(--color-accent);
+		color: #fff;
+	}
+	.feedback {
+		color: var(--color-success);
+		margin-top: 0.5rem;
+	}
+</style>
+
+<script is:inline define:vars={{ dialogId }}>
+	(function() {
+		const dialog = document.getElementById(dialogId);
+		if (!dialog) return;
+		dialog.querySelector('.modal-close').addEventListener('click', () => dialog.close());
+		dialog.addEventListener('click', (e) => {
+			if (e.target === dialog) dialog.close();
+		});
+	})();
+</script>

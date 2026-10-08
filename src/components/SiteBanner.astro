@@ -1,0 +1,26 @@
+---
+interface Props {
+	banner: {
+		src: string;
+		alt: string;
+		height: string;
+	};
+}
+
+const { banner } = Astro.props;
+---
+
+<div class="section">
+	<div class="card">
+		<div class="card-body">
+			<h2 class="card-title">バナー</h2>
+			<p style="text-align: center; margin-bottom: 0;">
+				<img src={banner.src}
+				     alt={banner.alt}
+				     height={banner.height}
+				     class="banner-img"
+				     loading="lazy">
+			</p>
+		</div>
+	</div>
+</div>
