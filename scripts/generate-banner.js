@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import sharp from 'sharp';
 import https from 'https';
+import http from 'http';
 
 // fontconfig設定をsharp(librsvg)から見えるようにする
 if (!process.env.FONTCONFIG_FILE && existsSync('/etc/fonts/fonts.conf')) {
@@ -14,7 +15,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
 
-// content.jsonを読み込む
 const contentPath = join(rootDir, 'src/data/content.json');
 const content = JSON.parse(readFileSync(contentPath, 'utf-8'));
 
@@ -25,13 +25,11 @@ if (!bannerConfig.enabled) {
   process.exit(0);
 }
 
-// 画像をダウンロード
 function downloadImage(url) {
   return new Promise((resolve, reject) => {
     const makeRequest = (urlStr) => {
-      const protocol = urlStr.startsWith('https:') ? https : https;
-      protocol.get(urlStr, (res) => {
-        // リダイレクトに対応
+      const client = urlStr.startsWith('http:') ? http : https;
+      client.get(urlStr, (res) => {
         if (res.statusCode === 301 || res.statusCode === 302) {
           makeRequest(res.headers.location);
           return;
@@ -64,25 +62,24 @@ async function generateBanner() {
   const { width, height, mainText, subText, characterImage, backgroundColor, 
           textColor, subTextColor, mainFontSize, subFontSize, fontFamily, fontWeight } = bannerConfig;
 
-  // キャラクター画像をダウンロードして準備
   let characterBuffer;
   let characterComposite = null;
-  let textStartX = 10; // デフォルトの左余白
+  let textStartX = 10;
   
   if (characterImage && characterImage.trim() !== '') {
     try {
       console.log('Downloading character image...');
       characterBuffer = await downloadImage(characterImage);
       
-      // キャラクター画像のサイズを調整（左側に正方形で配置）
-      const characterWidth = height; // 正方形
+      // 左端に正方形で置き、その右にテキストを流す
+      const characterWidth = height;
       
       if (characterBuffer && characterBuffer.length > 0) {
         try {
           characterComposite = await sharp(characterBuffer)
             .resize(characterWidth, height, { fit: 'cover', position: 'center' })
             .toBuffer();
-          textStartX = characterWidth + 5; // キャラクターの右側、小さい余白
+          textStartX = characterWidth + 5;
         } catch (err) {
           console.warn('Failed to process character image:', err.message);
         }
@@ -92,7 +89,6 @@ async function generateBanner() {
     }
   }
 
-  // テキスト部分のSVGを生成
   const lines = mainText.split('\\n');
   const lineHeight = mainFontSize * 1.1;
   const totalTextHeight = lines.length * lineHeight;
@@ -104,7 +100,6 @@ async function generateBanner() {
     textSvg += `<text x="${textStartX}" y="${y}" font-family="${fontFamily}" font-size="${mainFontSize}" font-weight="${fontWeight}" fill="${textColor}">${line}</text>`;
   });
 
-  // サブテキスト（右寄せ）
   let subTextSvg = '';
   if (subText && subText.trim() !== '') {
     const subTextY = startY + (lines.length * lineHeight) + 5;
@@ -120,22 +115,15 @@ async function generateBanner() {
 </svg>
   `.trim();
 
-  // 背景+テキストのSVGを画像化
   const baseImage = await sharp(Buffer.from(svg))
     .png()
     .toBuffer();
 
-  // publicディレクトリを確保
   const publicDir = join(rootDir, 'public');
-  try {
-    mkdirSync(publicDir, { recursive: true });
-  } catch (err) {
-    // Already exists
-  }
+  mkdirSync(publicDir, { recursive: true });
 
   const outputPath = join(publicDir, 'banya-.webp');
 
-  // キャラクター画像を合成
   if (characterComposite) {
     await sharp(baseImage)
       .composite([{
@@ -153,7 +141,6 @@ async function generateBanner() {
 
   console.log(`✅ Banner generated: ${outputPath} (${width}x${height})`);
 
-  // favicon生成 (32x32 + apple-touch-icon 180x180)
   if (characterBuffer && characterBuffer.length > 0) {
     try {
       await sharp(characterBuffer)
@@ -172,7 +159,6 @@ async function generateBanner() {
     }
   }
 
-  // OGP画像生成 (1200x630)
   const ogpWidth = 1200;
   const ogpHeight = 630;
   const ogpAvatarSize = 280;
@@ -217,7 +203,7 @@ async function generateBanner() {
 }
 
 generateBanner().then(() => {
-  // NOTE: explicitly exit — keep-alive sockets from image download
+  // NOTE: explicit exit; keep-alive sockets from image download
   // can hold the event loop open forever
   process.exit(0);
 }).catch((err) => {

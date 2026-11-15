@@ -11,17 +11,18 @@ interface Props {
 
 const { id, title, contentLabel, contentValue, copyButtonText, copyFeedbackText, closeButtonLabel } = Astro.props;
 const dialogId = `${id}Dialog`;
+const titleId = `${id}DialogTitle`;
 ---
 
-<dialog id={dialogId} class="modal-dialog">
+<dialog id={dialogId} class="modal-dialog" aria-labelledby={titleId} {...({ closedby: 'any' } as any)}>
 	<div class="modal-header">
-		<h5 class="modal-title">{title}</h5>
+		<h2 id={titleId} class="modal-title">{title}</h2>
 		<button type="button" class="modal-close" aria-label={closeButtonLabel}>&times;</button>
 	</div>
 	<div class="modal-body">
 		<p><code id={contentLabel}>{contentValue}</code></p>
-		<button class="btn-copy" onclick={`copyID('${contentLabel}', '${id}Feedback')`}>{copyButtonText}</button>
-		<div id={`${id}Feedback`} class="feedback hidden">{copyFeedbackText}</div>
+		<button class="btn-copy" autofocus onclick={`copyID('${contentLabel}', '${id}Feedback')`}>{copyButtonText}</button>
+		<div id={`${id}Feedback`} class="feedback" role="status" data-text={copyFeedbackText}></div>
 	</div>
 </dialog>
 
@@ -35,8 +36,13 @@ const dialogId = `${id}Dialog`;
 		max-width: 400px;
 		width: calc(100% - 2rem);
 	}
+	.modal-dialog:modal {
+		overscroll-behavior: contain;
+	}
 	.modal-dialog::backdrop {
 		background: rgba(0, 0, 0, 0.5);
+		overflow: hidden;
+		overscroll-behavior: contain;
 	}
 	.modal-header {
 		display: flex;
@@ -62,30 +68,42 @@ const dialogId = `${id}Dialog`;
 	.modal-close:hover {
 		color: var(--color-text);
 	}
+	.modal-close:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
 	.modal-body {
 		padding: 1.5rem;
 		text-align: center;
 	}
 	.modal-body code {
-		font-size: 1.1rem;
+		font-size: 1rem;
 	}
 	.btn-copy {
 		background: none;
 		border: 1px solid var(--color-accent);
 		color: var(--color-accent);
-		padding: 0.375rem 0.75rem;
+		padding: 0.5rem 0.75rem;
 		border-radius: var(--radius);
 		cursor: pointer;
 		font-size: 1rem;
-		transition: background 0.15s, color 0.15s;
+		transition: background-color 0.15s, color 0.15s;
 	}
-	.btn-copy:hover {
+	.btn-copy:hover,
+	.btn-copy:active {
 		background: var(--color-accent);
-		color: #fff;
+		color: var(--color-on-accent);
+	}
+	.btn-copy:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
 	}
 	.feedback {
 		color: var(--color-success);
 		margin-top: 0.5rem;
+	}
+	.feedback:empty {
+		margin-top: 0;
 	}
 </style>
 
@@ -94,8 +112,20 @@ const dialogId = `${id}Dialog`;
 		const dialog = document.getElementById(dialogId);
 		if (!dialog) return;
 		dialog.querySelector('.modal-close').addEventListener('click', () => dialog.close());
-		dialog.addEventListener('click', (e) => {
-			if (e.target === dialog) dialog.close();
+
+		// closedby 非対応ブラウザ向け。ドラッグ選択の終点が外側でも閉じないよう押下位置も見る
+		if ('closedBy' in HTMLDialogElement.prototype) return;
+		const isOutside = (event) => {
+			const rect = dialog.getBoundingClientRect();
+			return event.clientX < rect.left || event.clientX > rect.right ||
+				event.clientY < rect.top || event.clientY > rect.bottom;
+		};
+		let pressedOutside = false;
+		dialog.addEventListener('pointerdown', (event) => {
+			pressedOutside = isOutside(event);
+		});
+		dialog.addEventListener('pointerup', (event) => {
+			if (pressedOutside && isOutside(event)) dialog.close();
 		});
 	})();
 </script>
