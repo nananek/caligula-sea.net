@@ -74,6 +74,9 @@ const { profile, modals } = Astro.props;
 	.profile-card {
 		overflow: hidden;
 	}
+	.profile-card .card-title {
+		font-size: 1.5rem;
+	}
 	.profile-layout {
 		display: flex;
 		flex-direction: column;
@@ -114,17 +117,18 @@ const { profile, modals } = Astro.props;
 	.social-button {
 		display: flex;
 		align-items: center;
-		padding: 6px 12px;
+		padding: 0.5rem 0.75rem;
+		font-family: inherit;
 		font-size: 1rem;
-		height: 36px;
+		min-height: 2.25rem;
 		flex: 1 1 calc(50% - 0.25rem);
 		border: 1px solid var(--color-card-border);
 		border-radius: var(--radius);
-		background: var(--color-card-bg);
-		color: var(--color-text);
+		background: var(--color-social-bg);
+		color: var(--color-social-text);
 		text-decoration: none;
 		cursor: pointer;
-		transition: transform 0.2s, box-shadow 0.2s;
+		transition: border-color 0.15s, background-color 0.15s;
 	}
 	@media (max-width: 576px) {
 		.social-button {
@@ -133,8 +137,11 @@ const { profile, modals } = Astro.props;
 		}
 	}
 	.social-button:hover {
-		transform: translateY(-1px);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		border-color: var(--color-accent);
+		background: var(--color-social-bg-hover);
+	}
+	.social-button:active {
+		background: var(--color-social-bg-hover);
 	}
 	.social-button:focus-visible {
 		outline: 2px solid var(--color-accent);
@@ -143,10 +150,6 @@ const { profile, modals } = Astro.props;
 	.social-icon {
 		margin-right: 0.5rem;
 		flex-shrink: 0;
-	}
-	:global(html[data-theme="dark"]) .social-button {
-		background: #d0d0d0;
-		color: #222;
 	}
 	.social-label {
 		white-space: nowrap;
