@@ -58,6 +58,18 @@ function downloadImage(url) {
   });
 }
 
+function loadLocalImage(pathname) {
+  const relative = pathname.startsWith('/') ? join('public', pathname) : pathname;
+  return readFileSync(join(rootDir, relative));
+}
+
+async function loadImage(src) {
+  if (/^https?:\/\//i.test(src)) {
+    return downloadImage(src);
+  }
+  return loadLocalImage(src);
+}
+
 async function generateBanner() {
   const { width, height, mainText, subText, characterImage, backgroundColor, 
           textColor, subTextColor, mainFontSize, subFontSize, fontFamily, fontWeight } = bannerConfig;
@@ -67,25 +79,21 @@ async function generateBanner() {
   let textStartX = 10;
   
   if (characterImage && characterImage.trim() !== '') {
+    console.log(`Loading character image: ${characterImage}`);
+
     try {
-      console.log('Downloading character image...');
-      characterBuffer = await downloadImage(characterImage);
-      
-      // 左端に正方形で置き、その右にテキストを流す
-      const characterWidth = height;
-      
-      if (characterBuffer && characterBuffer.length > 0) {
-        try {
-          characterComposite = await sharp(characterBuffer)
-            .resize(characterWidth, height, { fit: 'cover', position: 'center' })
-            .toBuffer();
-          textStartX = characterWidth + 5;
-        } catch (err) {
-          console.warn('Failed to process character image:', err.message);
-        }
-      }
+      characterBuffer = await loadImage(characterImage);
     } catch (err) {
-      console.error('Failed to download character image:', err.message);
+      throw new Error(`Failed to load character image (${characterImage}): ${err.message}`);
+    }
+
+    try {
+      characterComposite = await sharp(characterBuffer)
+        .resize(height, height, { fit: 'cover', position: 'center' })
+        .toBuffer();
+      textStartX = height + 5;
+    } catch (err) {
+      throw new Error(`Failed to process character image (${characterImage}): ${err.message}`);
     }
   }
 
@@ -141,22 +149,18 @@ async function generateBanner() {
 
   console.log(`✅ Banner generated: ${outputPath} (${width}x${height})`);
 
-  if (characterBuffer && characterBuffer.length > 0) {
-    try {
-      await sharp(characterBuffer)
-        .resize(32, 32, { fit: 'cover', position: 'center' })
-        .png()
-        .toFile(join(publicDir, 'favicon.png'));
-      console.log('✅ Favicon generated: favicon.png (32x32)');
+  if (characterBuffer) {
+    await sharp(characterBuffer)
+      .resize(32, 32, { fit: 'cover', position: 'center' })
+      .png()
+      .toFile(join(publicDir, 'favicon.png'));
+    console.log('✅ Favicon generated: favicon.png (32x32)');
 
-      await sharp(characterBuffer)
-        .resize(180, 180, { fit: 'cover', position: 'center' })
-        .png()
-        .toFile(join(publicDir, 'apple-touch-icon.png'));
-      console.log('✅ Apple touch icon generated: apple-touch-icon.png (180x180)');
-    } catch (err) {
-      console.warn('⚠️ Failed to generate favicon:', err.message);
-    }
+    await sharp(characterBuffer)
+      .resize(180, 180, { fit: 'cover', position: 'center' })
+      .png()
+      .toFile(join(publicDir, 'apple-touch-icon.png'));
+    console.log('✅ Apple touch icon generated: apple-touch-icon.png (180x180)');
   }
 
   const ogpWidth = 1200;

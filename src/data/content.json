@@ -6,7 +6,7 @@
   "profile": {
     "name": "猫乃名無 (仮)",
     "nameRomaji": "Nekono Nana KAKKO KARI",
-    "image": "https://misskey.caligula-sea.net/proxy/avatar.webp?url=https%3A%2F%2Fmisskey.caligula-sea.net%2Ffiles%2Fa21a05bd-688a-4bcb-9fb6-0937283788ac&avatar=1",
+    "image": "/avatar.webp",
     "socialLinks": [
       {
         "name": "Misskey",
@@ -81,7 +81,7 @@
       "height": 180,
       "mainText": "7743号室のかりぐらし",
       "subText": "by Nekono Nana KAKKO KARI",
-      "characterImage": "https://misskey.caligula-sea.net/proxy/avatar.webp?url=https%3A%2F%2Fmisskey.caligula-sea.net%2Ffiles%2Fa21a05bd-688a-4bcb-9fb6-0937283788ac&avatar=1",
+      "characterImage": "/avatar.webp",
       "backgroundColor": "#ffffff",
       "textColor": "#000000",
       "subTextColor": "#555555",
